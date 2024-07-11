@@ -1,0 +1,1 @@
+{"correct":0.5,"total":1,"failedTests":["root -> task2: FAILED: data types do not match:\nExpected type: int64\nRecieved type: float64"]}
