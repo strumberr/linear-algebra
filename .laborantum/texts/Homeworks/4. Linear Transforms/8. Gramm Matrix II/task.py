@@ -1,55 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[5]:
-
-
-import numpy
-import json_tricks
-import os
-
-numpy.random.seed(42)
-
-debug_cases = []
-for index in range(20):
-    B_shape = numpy.random.randint(1, 10, size=[2])
-    B_shape[1] = B_shape[0]
-
-    B_L = numpy.tril(numpy.random.randint(-5, 5, size=B_shape))
-    B_U = numpy.triu(numpy.random.randint(-5, 5, size=B_shape))
-
-    numpy.fill_diagonal(B_L, 1)
-    numpy.fill_diagonal(B_U, 1)
-
-    B = B_L @ B_U
-
-    x = numpy.random.randint(-5, 5, size=[B_shape[0]])
-    debug_cases.append({'B': B, 'x': x})
-
-os.makedirs('testcases', exist_ok=True)
-with open('testcases/debug_cases.json', 'w+') as fin:
-    fin.write(json_tricks.dumps(debug_cases))
-
-public_cases = []
-for index in range(20):
-    B_shape = numpy.random.randint(1, 10, size=[2])
-    B_shape[1] = B_shape[0]
-
-    B_L = numpy.tril(numpy.random.randn(*B_shape))
-    B_U = numpy.triu(numpy.random.randn(*B_shape))
-
-    numpy.fill_diagonal(B_L, 1)
-    numpy.fill_diagonal(B_U, 1)
-
-    B = B_L @ B_U
-
-    x = numpy.random.randint(-5, 5, size=[B_shape[0]])
-    public_cases.append({'B': B, 'x': x})
-
-with open('testcases/public_cases.json', 'w+') as fin:
-    fin.write(json_tricks.dumps(public_cases))
-
-
 # In[6]:
 
 
@@ -83,9 +34,17 @@ public_cases = json_tricks.load(
 
 import numpy as np
 
-def contra_to_co(B, x):
-    G = B @ B.T
-    return np.linalg.inv(G) @ x
+def co_to_contra(B, x):
+    # Compute the Gram matrix G
+    G = np.dot(B.T, B)
+    
+    # Invert the Gram matrix
+    G_inv = np.linalg.inv(G)
+    
+    # Compute the coordinates of the vector x in the orthonormal basis
+    x = np.dot(B, np.dot(G_inv, x))
+    
+    return x
 
 
 # In[8]:
@@ -95,8 +54,8 @@ import time
 
 start = time.time()
 
-debug_result = [contra_to_co(**x) for x in debug_cases]
-answer = [contra_to_co(**x) for x in public_cases]
+debug_result = [co_to_contra(**x) for x in debug_cases]
+answer = [co_to_contra(**x) for x in public_cases]
 
 print(time.time() - start, '<- Elapsed time')
 

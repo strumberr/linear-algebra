@@ -29,25 +29,23 @@ public_cases = json_tricks.load(
     str(path / 'testcases' / 'public_cases.json'))
 
 
-# In[2]:
+# In[1]:
 
 
 import numpy as np
 
 def contra_to_co(B, x):
    
-    # B are basis vectors
-    # x is a vector in contra-variant basis
-    # return x in co-variant basis
+    # Compute the Gram matrix G
+    G = np.dot(B.T, B)
     
-    res = []
+    # Compute the dot products of x with the basis vectors
+    x_dot_B = np.dot(B.T, x)
     
-    for el in B:
-        # dot product of el and x:
-        dot = np.dot(el, x)
-        res.append(dot)
+    # Solve for the covariant coordinates
+    x_covariant = np.linalg.solve(G, x_dot_B)
     
-    return np.array(res)
+    return x_covariant
 
 
 
